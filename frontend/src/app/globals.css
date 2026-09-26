@@ -1,0 +1,317 @@
+@import "tailwindcss";
+
+/* =====================================================================
+   NWIS DARK-TECH INDUSTRIAL DESIGN SYSTEM
+   Taste-skill dials: DESIGN_VARIANCE:4 | MOTION_INTENSITY:4 | VISUAL_DENSITY:8
+   Theme: Strict dark mode lock. No inversion between sections.
+   Palette: Zinc-950 base · Emerald-400 (safe/ok) · Rose-500 (hazard/critical)
+            Electric Blue #2EB9DF (live/active) · Amber-400 (warning)
+   Typography: Geist Sans display · JetBrains Mono data values
+   ===================================================================== */
+
+
+@theme inline {
+  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), var(--font-geist-mono), monospace;
+
+  /* --- Core Palette --- */
+  --color-base-950:     #09090b;   /* Near-black canvas */
+  --color-base-900:     #18181b;   /* Panel backgrounds */
+  --color-base-800:     #27272a;   /* Card backgrounds */
+  --color-base-700:     #3f3f46;   /* Borders */
+  --color-base-600:     #52525b;   /* Muted text */
+  --color-base-400:     #a1a1aa;   /* Secondary text */
+  --color-base-200:     #e4e4e7;   /* Primary text */
+  --color-base-50:      #fafafa;   /* High-emphasis text */
+
+  /* --- Semantic Accent Colors --- */
+  --color-ok:           #34d399;   /* Emerald-400 — safe, normal, ok */
+  --color-ok-dim:       #064e3b;   /* Emerald-900 — safe backgrounds */
+  --color-critical:     #f43f5e;   /* Rose-500 — critical hazard */
+  --color-critical-dim: #4c0519;   /* Rose-950 — critical backgrounds */
+  --color-warning:      #fbbf24;   /* Amber-400 — warning */
+  --color-warning-dim:  #451a03;   /* Amber-950 — warning backgrounds */
+  --color-live:         #2eb9df;   /* Electric Blue — live data, active states */
+  --color-live-dim:     #0c2233;   /* Blue-950 — live backgrounds */
+  --color-advisory:     #818cf8;   /* Indigo-400 — advisory/informational */
+
+  /* --- Formation Colors (geological layer coding) --- */
+  --color-form-girujan:  #6b7280;  /* Gray */
+  --color-form-tipam:    #d97706;  /* Amber */
+  --color-form-barail:   #059669;  /* Emerald */
+  --color-form-kopili:   #dc2626;  /* Red */
+
+  /* --- Spacing scale --- */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+}
+
+/* =====================================================================
+   BASE RESET
+   ===================================================================== */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--color-base-950);
+  color: var(--color-base-200);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100dvh;
+}
+
+/* =====================================================================
+   TYPOGRAPHY
+   ===================================================================== */
+
+.display-xl {
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  color: var(--color-base-50);
+}
+
+.display-lg {
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+  color: var(--color-base-50);
+}
+
+.section-heading {
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--color-base-200);
+}
+
+.mono-data {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.mono-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-base-600);
+}
+
+/* =====================================================================
+   LAYOUT PRIMITIVES
+   ===================================================================== */
+
+.app-shell {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  grid-template-rows: 56px 1fr;
+  min-height: 100dvh;
+}
+
+.header-bar {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  background: var(--color-base-900);
+  border-bottom: 1px solid var(--color-base-700);
+  display: flex;
+  align-items: center;
+  padding: 0 1.25rem;
+  gap: 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.sidebar {
+  grid-column: 1;
+  grid-row: 2;
+  background: var(--color-base-900);
+  border-right: 1px solid var(--color-base-700);
+  overflow-y: auto;
+  position: sticky;
+  top: 56px;
+  height: calc(100dvh - 56px);
+}
+
+.main-content {
+  grid-column: 2;
+  grid-row: 2;
+  overflow-y: auto;
+  padding: 1.5rem;
+}
+
+/* =====================================================================
+   CARD / PANEL COMPONENTS
+   ===================================================================== */
+
+.panel {
+  background: var(--color-base-900);
+  border: 1px solid var(--color-base-700);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+}
+
+.panel-sm {
+  background: var(--color-base-900);
+  border: 1px solid var(--color-base-700);
+  border-radius: var(--radius-md);
+  padding: 0.875rem 1rem;
+}
+
+.metric-card {
+  background: var(--color-base-800);
+  border: 1px solid var(--color-base-700);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+/* =====================================================================
+   STATUS BADGES & CHIPS
+   ===================================================================== */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.badge-ok       { background: var(--color-ok-dim);       color: var(--color-ok);       border: 1px solid #065f46; }
+.badge-critical { background: var(--color-critical-dim); color: var(--color-critical); border: 1px solid #881337; }
+.badge-warning  { background: var(--color-warning-dim);  color: var(--color-warning);  border: 1px solid #78350f; }
+.badge-live     { background: var(--color-live-dim);     color: var(--color-live);     border: 1px solid #164e63; }
+.badge-advisory { background: #1e1b4b;                  color: var(--color-advisory); border: 1px solid #312e81; }
+.badge-muted    { background: var(--color-base-800);     color: var(--color-base-400); border: 1px solid var(--color-base-700); }
+
+/* Pulsing indicator for live/active states */
+.pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-live);
+  animation: pulse-live 1.8s ease-in-out infinite;
+}
+
+@keyframes pulse-live {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.45; transform: scale(0.75); }
+}
+
+/* =====================================================================
+   BUTTONS
+   ===================================================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: all 120ms ease;
+  border: none;
+  outline: none;
+  white-space: nowrap;
+}
+
+.btn:active { transform: scale(0.98) translateY(1px); }
+
+.btn-primary {
+  background: var(--color-live);
+  color: #0a1929;
+}
+.btn-primary:hover { background: #4fc3f7; }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-base-400);
+  border: 1px solid var(--color-base-700);
+}
+.btn-ghost:hover { background: var(--color-base-800); color: var(--color-base-200); }
+
+.btn-danger {
+  background: var(--color-critical-dim);
+  color: var(--color-critical);
+  border: 1px solid #881337;
+}
+.btn-danger:hover { background: #4c0519; }
+
+/* =====================================================================
+   DATA VISUALIZATION HELPERS
+   ===================================================================== */
+
+.chart-container {
+  background: var(--color-base-900);
+  border: 1px solid var(--color-base-700);
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+}
+
+/* Risk bar (horizontal progress) */
+.risk-bar-track {
+  height: 6px;
+  background: var(--color-base-700);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.risk-bar-fill-critical { background: var(--color-critical); }
+.risk-bar-fill-warning  { background: var(--color-warning);  }
+.risk-bar-fill-ok       { background: var(--color-ok);       }
+
+/* =====================================================================
+   SCROLLBAR
+   ===================================================================== */
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--color-base-950); }
+::-webkit-scrollbar-thumb { background: var(--color-base-700); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-base-600); }
+
+/* =====================================================================
+   UTILITY OVERRIDES
+   ===================================================================== */
+
+.divider { border-top: 1px solid var(--color-base-700); }
+
+.text-ok       { color: var(--color-ok);       }
+.text-critical { color: var(--color-critical); }
+.text-warning  { color: var(--color-warning);  }
+.text-live     { color: var(--color-live);     }
+.text-muted    { color: var(--color-base-600); }
+.text-secondary { color: var(--color-base-400); }
+
+/* Transition for smooth WebSocket data updates */
+.data-update {
+  transition: color 300ms ease;
+}
