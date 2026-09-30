@@ -144,18 +144,48 @@ class Telemetry1Hz(Base):
 
 
 # ---------------------------------------------------------------------------
-# 7. Alarm History (ISA-18.2)
+# 7. Alarm History (ISA-18.2 compliant)
 # ---------------------------------------------------------------------------
 class AlarmHistory(Base):
     __tablename__ = "alarm_history"
 
     alarm_id = Column(String, primary_key=True, default=_uuid)
     wellbore_id = Column(String, nullable=False)
-    alarm_type = Column(String(50), nullable=False)       # Hazard class or anomaly type
-    priority = Column(String(20), nullable=False)          # Critical, Warning, Advisory
-    status = Column(String(20), nullable=False, default="Active")  # Active, Acknowledged, Dismissed
-    triggered_at = Column(DateTime, default=datetime.utcnow)
+    alarm_type = Column(String(50), nullable=False)        # Lost_Circulation, Gas_Kick, etc.
+    priority = Column(String(20), nullable=False)           # Critical, Warning, Advisory
+    # ISA-18.2 alarm states
+    alarm_state = Column(
+        String(30), nullable=False, default="UNACKNOWLEDGED"
+    )  # UNACKNOWLEDGED, ACKNOWLEDGED, SHELVED, CLEARED, SUPPRESSED
+    triggered_at = Column(DateTime, default=datetime.utcnow, index=True)
     acknowledged_at = Column(DateTime, nullable=True)
     acknowledged_by = Column(String(100), nullable=True)
+    acknowledgement_reason = Column(Text, nullable=True)
+    shelved_until = Column(DateTime, nullable=True)
     depth_tvdss = Column(Float, nullable=True)
+    trigger_depth_tvdss = Column(Float, nullable=True)
     message = Column(Text, nullable=False)
+    hazard_class = Column(String(50), nullable=True)
+    severity = Column(String(20), nullable=True)           # Critical, Warning, Advisory
+    probability = Column(Float, nullable=True)              # Model 3 output 0-1
+    confidence_interval_m = Column(Float, nullable=True)   # ± meters
+
+    @property
+    def status(self):
+        """Backward-compat alias for alarm_state."""
+        return self.alarm_state
+
+
+# ---------------------------------------------------------------------------
+# 8. Immutable Audit Log (A-10)
+# ---------------------------------------------------------------------------
+class AuditLog(Base):
+    __tablename__ = "audit_log"
+
+    log_id = Column(String, primary_key=True, default=_uuid)
+    timestamp = Column(DateTime, nullable=False, default=datetime.utcnow, index=True)
+    user_id = Column(String(100), nullable=False)
+    user_role = Column(String(50), nullable=False)      # RTOC_ENGINEER, GEOLOGIST, etc.
+    action = Column(String(80), nullable=False)          # ACKNOWLEDGE_ALERT, VALIDATE_DDR_OCR, …
+    target_id = Column(String(100), nullable=False)      # Alert ID, Event ID, Sim ID, etc.
+    reason = Column(Text, nullable=True)                 # Free-text reason / notes

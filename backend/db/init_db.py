@@ -12,7 +12,7 @@ from sqlalchemy.orm import sessionmaker
 
 from backend.db.models import (
     Base, Well, WelborePath, FormationCatalog,
-    WelboreCasing, EventLedger, AlarmHistory
+    WelboreCasing, EventLedger, AlarmHistory, AuditLog
 )
 
 DATABASE_URL = "sqlite+aiosqlite:///./nwis.db"

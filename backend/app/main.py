@@ -1,15 +1,18 @@
 """
-NWIS FastAPI Application Factory
+NWIS FastAPI Application Factory — v2.0
 """
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.api import wells, advisory, telemetry_ws, correlation, pore_pressure, documents
+from backend.api import (
+    wells, advisory, telemetry_ws, correlation,
+    pore_pressure, documents, analogues, audit,
+)
 
 app = FastAPI(
     title="NWIS — Nearby Wells Intelligence System",
     description="eRTMAC Real-Time Monitoring & Analytics Platform for Oil India Limited",
-    version="1.0.0",
+    version="2.0.0",
 )
 
 app.add_middleware(
@@ -20,17 +23,26 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# REST Routes
-app.include_router(wells.router, prefix="/api/wells", tags=["Wells & Map"])
-app.include_router(advisory.router, prefix="/api/advisory", tags=["Lookahead Advisory"])
-app.include_router(correlation.router, prefix="/api/correlation", tags=["Correlation Curtain"])
-app.include_router(pore_pressure.router, prefix="/api/pore-pressure", tags=["Pore Pressure"])
-app.include_router(documents.router, prefix="/api/documents", tags=["Document Intelligence"])
+# ── REST Routes ──────────────────────────────────────────────────────────────
+app.include_router(wells.router,          prefix="/api/wells",        tags=["Wells & Map"])
+app.include_router(advisory.router,       prefix="/api/advisory",     tags=["Lookahead Advisory"])
+app.include_router(correlation.router,    prefix="/api/correlation",  tags=["Correlation Curtain"])
+app.include_router(pore_pressure.router,  prefix="/api/pore-pressure",tags=["Pore Pressure"])
+app.include_router(documents.router,      prefix="/api/documents",    tags=["Document Intelligence"])
 
-# WebSocket
+# ── New Phase-2 Routes ───────────────────────────────────────────────────────
+app.include_router(analogues.router,      prefix="/api/analogues",    tags=["Model 1 - Analogue Selector"])
+app.include_router(audit.router,          prefix="/api/audit",        tags=["Audit & Attribution Log"])
+
+# ── WebSocket ────────────────────────────────────────────────────────────────
 app.include_router(telemetry_ws.router, tags=["Live Telemetry"])
 
 
 @app.get("/api/health", tags=["System"])
 async def health():
-    return {"status": "ok", "system": "NWIS", "version": "1.0.0"}
+    return {
+        "status": "ok",
+        "system": "NWIS",
+        "version": "2.0.0",
+        "spec": "eRTMAC-NWIS Master Product Specification v2",
+    }
