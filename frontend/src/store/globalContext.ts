@@ -51,6 +51,10 @@ export interface GlobalContextState {
   liveCasingShoeSize: string;
   liveActiveAlertCount: { critical: number; warning: number };
 
+  // Sandbox parameters for reporting
+  sandboxSimulatedEcd: number | null;
+  sandboxPill: string | null;
+
   // Actions
   setCursorDepth: (tvdss: number, md: number) => void;
   setSelectedOffsets: (wellIds: string[]) => void;
@@ -66,6 +70,7 @@ export interface GlobalContextState {
     | "liveLastSurveyMetersAgo" | "rigState"
     | "liveActiveAlertCount"
   >>) => void;
+  setSandboxParameters: (ecd: number | null, pill: string | null) => void;
 }
 
 export const useGlobalContext = create<GlobalContextState>()(
@@ -96,6 +101,9 @@ export const useGlobalContext = create<GlobalContextState>()(
       liveCasingShoeSize: '9⅝"',
       liveActiveAlertCount: { critical: 1, warning: 2 },
 
+      sandboxSimulatedEcd: null,
+      sandboxPill: null,
+
       // Actions
       setCursorDepth: (tvdss, md) => set({ cursorTVDSS: tvdss, cursorMD: md }),
       setSelectedOffsets: (wellIds) =>
@@ -108,6 +116,7 @@ export const useGlobalContext = create<GlobalContextState>()(
       setStreamStatus: (status, ageSeconds) =>
         set({ streamStatus: status, streamAgeSeconds: ageSeconds }),
       updateLiveMetrics: (metrics) => set((s) => ({ ...s, ...metrics })),
+      setSandboxParameters: (ecd, pill) => set({ sandboxSimulatedEcd: ecd, sandboxPill: pill }),
     }),
     {
       name: "nwis-global-context",

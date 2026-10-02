@@ -9,6 +9,7 @@
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
+/nwis-dashboard
 
 # testing
 /coverage

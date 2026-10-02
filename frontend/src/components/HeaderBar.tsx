@@ -1,75 +1,48 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Link from "next/link";
 import { useGlobalContext } from "@/store/globalContext";
 import { fmtDepth, fmtMudWeight, fmtEMW } from "@/lib/units";
-import { StreamStatusBadge, StatusBadge } from "@/components/ui/StatusComponents";
 
 const DIVIDER = (
   <div
     aria-hidden="true"
     style={{
       width: 1,
-      height: 18,
-      borderLeft: "1px solid #2a3654",
+      height: 16,
+      backgroundColor: "#dbdad6",
       flexShrink: 0,
     }}
   />
 );
 
-const MetricCell = ({
-  label,
-  value,
-  valueColor,
-}: {
-  label: string;
-  value: string;
-  valueColor?: string;
-}) => (
-  <div style={{ display: "flex", alignItems: "baseline", gap: "5px", flexShrink: 0 }}>
-    <span
-      style={{
-        fontFamily: "var(--font-mono, 'IBM Plex Mono', monospace)",
-        fontSize: "0.6rem",
-        color: "#64748b",
-        textTransform: "uppercase",
-        letterSpacing: "0.05em",
-      }}
-    >
-      {label}
-    </span>
-    <span
-      style={{
-        fontFamily: "var(--font-mono, 'IBM Plex Mono', monospace)",
-        fontSize: "0.75rem",
-        fontWeight: 600,
-        color: valueColor ?? "#f8fafc",
-        fontVariantNumeric: "tabular-nums",
-      }}
-    >
-      {value}
-    </span>
-  </div>
-);
-
 export function HeaderBar() {
   const ctx = useGlobalContext();
+  const [timeStr, setTimeStr] = useState("UTC 14:22:08");
+
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      setTimeStr(`UTC ${now.toTimeString().split(" ")[0]}`);
+    };
+    updateTime();
+    const timer = setInterval(updateTime, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   // Simulate live depth advancement + stream age
   useEffect(() => {
     const interval = setInterval(() => {
-      // Get latest state without adding it to deps and causing re-renders
       const state = useGlobalContext.getState();
-      
       let nextAge = state.streamAgeSeconds + 1;
-      if (nextAge > 10) nextAge = 0.4; // reset to keep demo live
-      
+      if (nextAge > 10) nextAge = 0.4;
       const status = nextAge < 5 ? "LIVE" : nextAge < 60 ? "DELAYED" : "STALE";
-      
+
       state.updateLiveMetrics({
         liveBitDepthMD: parseFloat((state.liveBitDepthMD + 0.005).toFixed(3)),
         liveBitDepthTVDSS: parseFloat((state.liveBitDepthTVDSS + 0.0047).toFixed(3)),
-        liveROP: parseFloat((16 + Math.random() * 5).toFixed(1)),
+        liveROP: parseFloat((13 + Math.random() * 3).toFixed(1)),
         liveECD: parseFloat((1.33 + Math.random() * 0.02).toFixed(3)),
       });
       state.setStreamStatus(status as "LIVE" | "DELAYED" | "STALE", nextAge);
@@ -78,207 +51,196 @@ export function HeaderBar() {
   }, []);
 
   const u = ctx.unitSystem;
-  const alerts = ctx.liveActiveAlertCount;
-
   const toggleUnit = useCallback(() => {
     ctx.setUnitSystem(u === "METRIC" ? "IMPERIAL" : "METRIC");
   }, [ctx, u]);
 
-  const rigStateColor =
-    ctx.rigState === "DRILLING_ROTARY" || ctx.rigState === "DRILLING_SLIDE"
-      ? "#10b981"
-      : ctx.rigState === "CONNECTION"
-      ? "#f59e0b"
-      : "#94a3b8";
+  const alerts = ctx.liveActiveAlertCount;
 
   return (
     <header
       role="banner"
+      className="header-bar select-none"
       style={{
-        position: "sticky",
-        top: 0,
-        zIndex: 50,
-        background: "#0b0f19",
-        borderBottom: "1px solid #2a3654",
-        padding: "0 16px",
-        height: "52px",
+        height: "56px",
+        backgroundColor: "rgba(250, 249, 245, 0.94)",
+        backdropFilter: "blur(8px)",
+        borderBottom: "1px solid #dbdad6",
+        padding: "0 1.75rem",
         display: "flex",
         alignItems: "center",
-        gap: "10px",
-        overflow: "hidden",
+        justifyContent: "space-between",
+        position: "sticky",
+        top: 0,
+        zIndex: 40,
       }}
     >
-      {/* Brand */}
-      <div
-        style={{
-          fontFamily: "var(--font-mono, 'IBM Plex Mono', monospace)",
-          fontSize: "0.8rem",
-          fontWeight: 700,
-          color: "#f8fafc",
-          letterSpacing: "0.06em",
-          flexShrink: 0,
-        }}
-      >
-        NWIS
+      {/* Left: Rig info & Active section tags */}
+      <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "7px" }}>
+          <span
+            style={{
+              width: "8px",
+              height: "8px",
+              borderRadius: "50%",
+              backgroundColor: "#fecf50",
+              border: "1px solid #d4a72c",
+              display: "inline-block",
+            }}
+          />
+          <span
+            style={{
+              fontFamily: "var(--font-space-grotesk), sans-serif",
+              fontSize: "11px",
+              fontWeight: 700,
+              letterSpacing: "0.12em",
+              color: "#0d0d0d",
+              textTransform: "uppercase",
+            }}
+          >
+            RIG SE-802
+          </span>
+          <span
+            style={{
+              fontFamily: "var(--font-jetbrains-mono), monospace",
+              fontSize: "10px",
+              color: "#747878",
+              letterSpacing: "0.05em",
+            }}
+          >
+            WELL INTEL HUD
+          </span>
+        </div>
+
+        {DIVIDER}
+
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "10px", fontFamily: "var(--font-jetbrains-mono), monospace", color: "#444748" }}>
+          <span
+            style={{
+              padding: "2px 7px",
+              borderRadius: "4px",
+              backgroundColor: "#efeeea",
+              border: "1px solid #dbdad6",
+              color: "#0d0d0d",
+              fontWeight: 600,
+            }}
+          >
+            ACTIVE SEC: 12¼&quot; INT
+          </span>
+          <span>FM: BARAIL / REEF</span>
+          {DIVIDER}
+          <span>TARGET: OIL-NH-12</span>
+          {DIVIDER}
+          <span style={{ fontWeight: 600, color: "#0d0d0d" }}>{timeStr}</span>
+        </div>
       </div>
 
-      {DIVIDER}
+      {/* Right: Live depth, alerts, unit toggle, user avatar */}
+      <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+        {/* Bit Depth Readout */}
+        <div style={{ display: "flex", alignItems: "baseline", gap: "5px", fontFamily: "var(--font-jetbrains-mono), monospace" }}>
+          <span style={{ fontSize: "9px", textTransform: "uppercase", color: "#747878", fontWeight: 600 }}>BIT:</span>
+          <span style={{ fontSize: "12px", fontWeight: 700, color: "#0d0d0d", fontVariantNumeric: "tabular-nums" }}>
+            {fmtDepth(ctx.liveBitDepthTVDSS, u, "TVDSS")}
+          </span>
+        </div>
 
-      {/* Active Well selector */}
-      <div style={{ display: "flex", alignItems: "center", gap: "5px", flexShrink: 0 }}>
-        <span
+        {DIVIDER}
+
+        {/* Hazard Level Badge */}
+        <Link
+          href="/advisory"
           style={{
-            fontFamily: "var(--font-mono, 'IBM Plex Mono', monospace)",
-            fontSize: "0.6rem",
-            color: "#64748b",
-            textTransform: "uppercase",
+            textDecoration: "none",
+            display: "flex",
+            alignItems: "center",
+            gap: "6px",
+            padding: "3px 9px",
+            borderRadius: "9999px",
+            backgroundColor: alerts.critical > 0 ? "rgba(186, 26, 26, 0.1)" : "#efeeea",
+            border: `1px solid ${alerts.critical > 0 ? "rgba(186, 26, 26, 0.3)" : "#dbdad6"}`,
+            fontSize: "10px",
+            fontFamily: "var(--font-jetbrains-mono), monospace",
+            fontWeight: 600,
+            color: alerts.critical > 0 ? "#ba1a1a" : "#1b1c1a",
           }}
         >
-          Active
-        </span>
-        <span
+          <span
+            style={{
+              width: "6px",
+              height: "6px",
+              borderRadius: "50%",
+              backgroundColor: alerts.critical > 0 ? "#ba1a1a" : "#10b981",
+              display: "inline-block",
+            }}
+          />
+          <span>{alerts.critical > 0 ? `${alerts.critical} CRITICAL ACTIVE` : "HAZARD LVL: MINIMAL"}</span>
+        </Link>
+
+        {/* Unit Toggle Button */}
+        <button
+          onClick={toggleUnit}
+          title="Toggle Metric (m/SG) vs Oilfield Standard (ft/ppg)"
           style={{
-            fontFamily: "var(--font-mono, 'IBM Plex Mono', monospace)",
-            fontSize: "0.75rem",
+            fontFamily: "var(--font-jetbrains-mono), monospace",
+            fontSize: "10px",
+            fontWeight: 600,
+            color: "#444748",
+            backgroundColor: "#efeeea",
+            border: "1px solid #dbdad6",
+            borderRadius: "9999px",
+            padding: "4px 10px",
+            cursor: "pointer",
+            transition: "all 0.15s",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = "#e9e8e4";
+            e.currentTarget.style.color = "#0d0d0d";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = "#efeeea";
+            e.currentTarget.style.color = "#444748";
+          }}
+        >
+          {u === "METRIC" ? "SI [m/SG]" : "OFS [ft/ppg]"}
+        </button>
+
+        {/* Stream Health Indicator */}
+        <div style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "10px", fontFamily: "var(--font-jetbrains-mono), monospace", color: "#10b981" }}>
+          <span
+            style={{
+              width: "6px",
+              height: "6px",
+              borderRadius: "50%",
+              backgroundColor: "#10b981",
+              display: "inline-block",
+              boxShadow: "0 0 6px #10b981",
+            }}
+          />
+          <span style={{ fontWeight: 600 }}>1 Hz</span>
+        </div>
+
+        {/* User Avatar Circle */}
+        <div
+          style={{
+            width: "30px",
+            height: "30px",
+            borderRadius: "50%",
+            backgroundColor: "#0d0d0d",
+            color: "#ffffff",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: "11px",
             fontWeight: 700,
-            color: "#10b981",
+            fontFamily: "var(--font-space-grotesk), sans-serif",
+            userSelect: "none",
           }}
+          title="Operator: Arjun Das (RTOC Engineer)"
         >
-          {ctx.activeWellName} ▾
-        </span>
+          AD
+        </div>
       </div>
-
-      {DIVIDER}
-
-      {/* Bit depth MD + TVDSS */}
-      <MetricCell
-        label="Bit MD"
-        value={fmtDepth(ctx.liveBitDepthMD, u, "MD")}
-        valueColor="#10b981"
-      />
-      <MetricCell
-        label="Bit TVDSS"
-        value={fmtDepth(ctx.liveBitDepthTVDSS, u, "TVDSS")}
-        valueColor="#f8fafc"
-      />
-
-      {DIVIDER}
-
-      {/* Hole section + casing shoe */}
-      <MetricCell label="Section" value={ctx.liveHoleSection} />
-      <span
-        style={{
-          fontFamily: "var(--font-mono, 'IBM Plex Mono', monospace)",
-          fontSize: "0.65rem",
-          color: "#94a3b8",
-          flexShrink: 0,
-        }}
-      >
-        Shoe {ctx.liveCasingShoeSize} @{" "}
-        {fmtDepth(ctx.liveCasingShoeDepth, u, "TVDSS")}
-      </span>
-
-      {DIVIDER}
-
-      {/* Survey age */}
-      <MetricCell
-        label="Last Survey"
-        value={`${ctx.liveLastSurveyMetersAgo.toFixed(0)} m ago`}
-        valueColor="#94a3b8"
-      />
-
-      {DIVIDER}
-
-      {/* MW In / Out / ECD */}
-      <MetricCell
-        label="MW In"
-        value={fmtMudWeight(ctx.liveMudWeightIn, u)}
-        valueColor="#f8fafc"
-      />
-      <MetricCell
-        label="Out"
-        value={fmtMudWeight(ctx.liveMudWeightOut, u)}
-        valueColor="#f8fafc"
-      />
-      <MetricCell
-        label="ECD"
-        value={fmtEMW(ctx.liveECD, u)}
-        valueColor={ctx.liveECD > 1.40 ? "#f59e0b" : "#f8fafc"}
-      />
-
-      {DIVIDER}
-
-      {/* Rig state */}
-      <span
-        style={{
-          fontFamily: "var(--font-mono, 'IBM Plex Mono', monospace)",
-          fontSize: "0.65rem",
-          fontWeight: 700,
-          color: rigStateColor,
-          border: `1px solid ${rigStateColor}`,
-          background: `${rigStateColor}18`,
-          borderRadius: "3px",
-          padding: "2px 7px",
-          flexShrink: 0,
-          letterSpacing: "0.04em",
-        }}
-      >
-        {ctx.rigState.replace(/_/g, " ")}
-      </span>
-
-      {/* Spacer */}
-      <div style={{ flex: 1 }} />
-
-      {/* Stream status */}
-      <StreamStatusBadge
-        status={ctx.streamStatus}
-        ageSeconds={ctx.streamAgeSeconds}
-        hz={1}
-      />
-
-      {/* Alert counts */}
-      {alerts.critical > 0 && (
-        <StatusBadge level="critical" label={`${alerts.critical} Critical`} size="sm" />
-      )}
-      {alerts.warning > 0 && (
-        <StatusBadge level="warning" label={`${alerts.warning} Warning`} size="sm" />
-      )}
-
-      {/* Unit toggle */}
-      <button
-        id="unit-toggle"
-        onClick={toggleUnit}
-        title="Toggle metric / imperial units"
-        style={{
-          fontFamily: "var(--font-mono, 'IBM Plex Mono', monospace)",
-          fontSize: "0.62rem",
-          color: "#94a3b8",
-          background: "#1c253b",
-          border: "1px solid #2a3654",
-          borderRadius: "3px",
-          padding: "3px 8px",
-          cursor: "pointer",
-          flexShrink: 0,
-          transition: "border-color 0.15s",
-        }}
-      >
-        {u === "METRIC" ? "SI →" : "OFS →"}
-      </button>
-
-      {/* Demo tag */}
-      <span
-        style={{
-          fontFamily: "var(--font-mono, 'IBM Plex Mono', monospace)",
-          fontSize: "0.58rem",
-          color: "#64748b",
-          border: "1px solid #2a3654",
-          borderRadius: "3px",
-          padding: "2px 5px",
-          flexShrink: 0,
-        }}
-      >
-        DEMO DATA
-      </span>
     </header>
   );
 }

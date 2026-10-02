@@ -1,0 +1,90 @@
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Environment Variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.venv/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Project Specific Untracked Folders & Files
+Code/
+nwis-dashboard/
+FRONTEND_PAGES_AND_FLOWS.txt
+Architecture.md
+ML_Model_Spec.md
+ML_Models_and_Data_Sources.md
+"Product_Specification (1).md"
+Product_Specification.md
+skills-lock.json
+.agents/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.pnpm-store
+
+# Next.js
+.next/
+out/
+build/
+
+# Testing
+coverage/
+
+# Misc
+*.log
+*.bak
