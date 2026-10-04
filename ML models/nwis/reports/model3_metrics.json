@@ -1,0 +1,68 @@
+{
+  "Lost_Circulation": {
+    "hazard_class": "Lost_Circulation",
+    "n_folds": 5,
+    "mean_pr_auc": 0.962,
+    "std_pr_auc": 0.0064,
+    "mean_roc_auc": 0.9588,
+    "mean_f1": 0.9187,
+    "best_threshold": 0.4779,
+    "positive_rate_pct": 50.0,
+    "target_met": true
+  },
+  "Stuck_Pipe": {
+    "hazard_class": "Stuck_Pipe",
+    "n_folds": 5,
+    "mean_pr_auc": 0.9031,
+    "std_pr_auc": 0.0229,
+    "mean_roc_auc": 0.9511,
+    "mean_f1": 0.8711,
+    "best_threshold": 0.757,
+    "positive_rate_pct": 23.7763,
+    "target_met": true
+  },
+  "Overpressure_Zone": {
+    "hazard_class": "Overpressure_Zone",
+    "n_folds": 5,
+    "mean_pr_auc": 0.4761,
+    "std_pr_auc": 0.233,
+    "mean_roc_auc": 0.9655,
+    "mean_f1": 0.5598,
+    "best_threshold": 0.9079,
+    "positive_rate_pct": 1.1127,
+    "target_met": false
+  },
+  "Gas_Kick": {
+    "hazard_class": "Gas_Kick",
+    "n_folds": 5,
+    "mean_pr_auc": 0.9998,
+    "std_pr_auc": 0.0001,
+    "mean_roc_auc": 0.9331,
+    "mean_f1": 0.9987,
+    "best_threshold": 0.0032,
+    "positive_rate_pct": 99.7273,
+    "target_met": true
+  },
+  "Torque_Spike": {
+    "hazard_class": "Torque_Spike",
+    "n_folds": 5,
+    "mean_pr_auc": 0.8472,
+    "std_pr_auc": 0.0219,
+    "mean_roc_auc": 0.9059,
+    "mean_f1": 0.8134,
+    "best_threshold": 0.6961,
+    "positive_rate_pct": 30.9317,
+    "target_met": false
+  },
+  "Cementing_Issue": {
+    "hazard_class": "Cementing_Issue",
+    "n_folds": 5,
+    "mean_pr_auc": 0.8716,
+    "std_pr_auc": 0.0287,
+    "mean_roc_auc": 0.944,
+    "mean_f1": 0.826,
+    "best_threshold": 0.7089,
+    "positive_rate_pct": 28.9403,
+    "target_met": false
+  }
+}

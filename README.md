@@ -43,7 +43,26 @@ pip install -r requirements.txt
 python -m uvicorn app.main:app --reload --port 8000
 ```
 
-### 2. Frontend Setup (Next.js)
+### 2. ML Models Setup (FastAPI)
+In a new terminal, start the ML Inference server on port 8001:
+```bash
+cd "ML models/nwis"
+python -m venv .venv
+
+# Activate the virtual environment:
+# Windows:
+.\.venv\Scripts\activate
+# Mac/Linux:
+source .venv/bin/activate
+
+# Install dependencies
+pip install -r ../requirements.txt
+
+# Run the API server
+python serve.py
+```
+
+### 3. Frontend Setup (Next.js)
 In a new terminal window, navigate to the frontend directory:
 ```bash
 cd frontend
@@ -60,7 +79,8 @@ The platform will be accessible at `http://localhost:3000`.
 ## 📂 Repository Structure
 
 - `/frontend` - Next.js React application (UI, State, Components)
-- `/backend` - FastAPI Python server (API, Data Emulation, ML Endpoints)
+- `/backend` - FastAPI Python server (API, Data Emulation, ML Gateway)
+- `/ML models` - Python inference API with trained XGBoost, Isolation Forest & DTW models
 - `/Architecture.md` - Core system architecture and dataflow specifications
 - `/ML_Model_Spec.md` - Specifications for the predictive Lookahead ML models
 - `/Product_Specification.md` - Complete UI/UX and product feature specifications

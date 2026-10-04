@@ -173,31 +173,64 @@ async def get_analogues(
 
         cand_dict = {
             "wellbore_id": wb.wellbore_id,
-            "lat": w.latitude,
-            "lon": w.longitude,
-            "tvdss": wb.total_depth_tvdss,
-            "well_type": wb.well_type,
-            "hole_diameter_in": wb.hole_diameter_in,
-            "hazards": [],
-        }
-
-        scores = _compute_similarity(target_wb_dict, cand_dict, weights)
-        results.append({
             "well_name": w.well_name,
-            "field_name": w.field_name,
-            "wellbore_id": wb.wellbore_id,
-            "wellbore_name": wb.wellbore_name,
-            "total_depth_tvdss": wb.total_depth_tvdss,
-            **scores,
-        })
+            "d_g": _haversine_m(target_wb_dict["lat"], target_wb_dict["lon"], w.latitude, w.longitude),
+            "delta_z": abs(target_wb_dict["tvdss"] - wb.total_depth_tvdss),
+            "trajectory": wb.well_type,
+            "active_bit_in": target_wb_dict["hole_diameter_in"],
+            "offset_bit_in": wb.hole_diameter_in,
+            "active_formation_seq": [],
+            "offset_formation_seq": [],
+            "data_type": "LAS_Standard"
+        }
+        results.append(cand_dict)
 
-    results.sort(key=lambda x: x["similarity_score"], reverse=True)
-    ranked = [{"rank": i + 1, **r} for i, r in enumerate(results[:top_n])]
+    # Wire up ML Model 1: Offset Rank
+    ml_ranking = []
+    model_name = "Model_1_5Factor_Local"
+    try:
+        import httpx
+        async with httpx.AsyncClient() as client:
+            resp = await client.post("http://localhost:8001/v1/offset-rank", json={
+                "candidates": results
+            }, timeout=3.0)
+            if resp.status_code == 200:
+                ml_ranking = resp.json().get("ranking", [])
+                model_name = "Model_1_5Factor_ML"
+    except Exception as e:
+        print(f"ML Server error (Offset Rank): {e}")
+
+    if ml_ranking:
+        ranked = [{"rank": i + 1, **r} for i, r in enumerate(ml_ranking[:top_n])]
+    else:
+        # Fallback to local scoring if ML server is down
+        fallback_results = []
+        for cand in results:
+            cand_for_score = {
+                "wellbore_id": cand["wellbore_id"],
+                "lat": well_map[wb_map[cand["wellbore_id"]].well_id].latitude,
+                "lon": well_map[wb_map[cand["wellbore_id"]].well_id].longitude,
+                "tvdss": wb_map[cand["wellbore_id"]].total_depth_tvdss,
+                "well_type": cand["trajectory"],
+                "hole_diameter_in": cand["offset_bit_in"],
+            }
+            scores = _compute_similarity(target_wb_dict, cand_for_score, weights)
+            w = well_map.get(wb_map[cand["wellbore_id"]].well_id)
+            fallback_results.append({
+                "well_name": cand["well_name"],
+                "field_name": w.field_name if w else "Unknown",
+                "wellbore_id": cand["wellbore_id"],
+                "wellbore_name": wb_map[cand["wellbore_id"]].wellbore_name,
+                "total_depth_tvdss": cand_for_score["tvdss"],
+                **scores,
+            })
+        fallback_results.sort(key=lambda x: x["similarity_score"], reverse=True)
+        ranked = [{"rank": i + 1, **r} for i, r in enumerate(fallback_results[:top_n])]
 
     return {
         "target_wellbore_id": target_wb_orm.wellbore_id,
         "target_well_name": target_well_orm.well_name if target_well_orm else "Unknown",
         "weights_used": weights,
         "analogues": ranked,
-        "model": "Model_1_5Factor_Deterministic",
+        "model": model_name,
     }

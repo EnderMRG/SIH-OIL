@@ -1,0 +1,11 @@
+{
+  "weights": {
+    "w1_geo_distance": 0.2629,
+    "w2_strat_match": 0.3356,
+    "w3_tvdss_diff": 0.1487,
+    "w4_trajectory": 0.1005,
+    "w5_hole_clearance": 0.0872,
+    "w6_data_quality": 0.065
+  },
+  "cv_r2_mean": 0.8632805056239107
+}

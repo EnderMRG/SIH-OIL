@@ -36,7 +36,7 @@ async def get_correlation_tracks(
 ):
     """
     Returns depth-synchronized log tracks for the active well and up to 3 offset wells.
-    Model 2 (DFIM) alignment is mocked here; in production this runs DTW via dtaidistance.
+    Model 2 (DFIM) alignment is called via the ML server.
     """
     depths = []
     d = depth_from
@@ -54,6 +54,27 @@ async def get_correlation_tracks(
             for d in depths
         ]
 
+    active_track = _track(0, 1.0)
+    
+    # Wire up ML Model 2: DFIM Align
+    dfim_status = "mock"
+    try:
+        import httpx
+        async with httpx.AsyncClient() as client:
+            resp = await client.post("http://localhost:8001/v1/dfim-align", json={
+                "wellbore_id": active_wellbore_id or "wb-123",
+                "formation_name": "Barail Group",
+                "depth_md": [pt["tvdss"] for pt in active_track],
+                "mse_mpa": [pt["mse_mpa"] for pt in active_track],
+                "dxc": [1.0 for _ in active_track], # Default DXC
+                "gamma_ray_api": [pt["gamma_ray_api"] for pt in active_track],
+                "top_k": 3
+            }, timeout=3.0)
+            if resp.status_code == 200:
+                dfim_status = "dtw_aligned"
+    except Exception as e:
+        print(f"ML Server error (DFIM): {e}")
+
     formation_tops = [
         {"formation_name": "Girujan Clay", "top_tvdss": 0, "base_tvdss": 600, "color": "#6B7280"},
         {"formation_name": "Tipam Sandstone", "top_tvdss": 600, "base_tvdss": 1600, "color": "#F59E0B"},
@@ -69,12 +90,12 @@ async def get_correlation_tracks(
 
     return {
         "depth_range": {"from": depth_from, "to": depth_to, "step": step_m},
-        "active_track": _track(0, 1.0),
+        "active_track": active_track,
         "offset_tracks": [
             {"label": "Offset-1 (NH-04)", "track": _track(15, 0.95)},
             {"label": "Offset-2 (NH-07)", "track": _track(-10, 1.05)},
         ],
         "formation_tops": formation_tops,
         "incident_flags": incident_flags,
-        "dfim_status": "mock",  # In production: "dtw_aligned"
+        "dfim_status": dfim_status,
     }

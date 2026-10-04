@@ -35,10 +35,20 @@ FRONTEND_PAGES_AND_FLOWS.txt
 Architecture.md
 ML_Model_Spec.md
 ML_Models_and_Data_Sources.md
-"Product_Specification (1).md"
+Product_Specification (1).md
 Product_Specification.md
 skills-lock.json
 .agents/
+
+# Large Data & Database files
+*.pdf
+PublicNopims*.json
+*.db
+*.csv
+*.parquet
+*.zip
+*.pkl
+*.onnx
 
 # Python
 __pycache__/
