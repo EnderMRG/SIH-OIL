@@ -28,10 +28,10 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "WELLS.INTEL — Subsurface Intelligence | Oil India Limited",
+  title: "WELLS.INTEL — Subsurface Intelligence",
   description:
-    "Architectural Subsurface Editorial Platform for Oil India Limited (OIL). Live telemetry, 3D trajectory explorer, lookahead hazard advisory, and historical drilling intelligence.",
-  keywords: ["NWIS", "WELLS.INTEL", "eRTMAC", "Oil India", "drilling", "subsurface intelligence", "SIH2024"],
+    "Architectural Subsurface Editorial Platform for WELLS.INTEL. Live telemetry, 3D trajectory explorer, lookahead hazard advisory, and historical drilling intelligence.",
+  keywords: ["NWIS", "WELLS.INTEL", "eRTMAC", "drilling", "subsurface intelligence", "SIH2024"],
 };
 
 export default function RootLayout({

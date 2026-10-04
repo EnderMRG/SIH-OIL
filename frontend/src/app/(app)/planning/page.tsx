@@ -127,7 +127,7 @@ export default function PlanningPage() {
   const handleGenerateReport = () => {
     let csv = "Interval/Operation,Section,Start Depth,End Depth,Plan Days,Actual Days,Variance,NPT (Hrs),Status\n";
     filteredTimeline.forEach((row) => {
-      csv += `"${row.operation}",${row.section},${row.startDepth},${row.endDepth},${row.planDays},${row.actualDays},${row.variance},${row.nptHrs},${row.status}\n`;
+      csv += `"${row.interval}",${row.section},${row.startDepth},${row.endDepth},${row.planDays},${row.actualDays},${row.variance},${row.nptHours},${row.status}\n`;
     });
 
     const blob = new Blob([csv], { type: "text/csv" });

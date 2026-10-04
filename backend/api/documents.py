@@ -60,6 +60,31 @@ _mock_queue = [
 async def list_documents():
     return {"documents": _mock_docs}
 
+@router.post("/upload")
+async def upload_document(file: UploadFile = File(...)):
+    import tempfile
+    import os
+    from app.nlp_pipeline import extract_ddr_parameters
+
+    # Save to temp file
+    temp_pdf = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
+    try:
+        content = await file.read()
+        temp_pdf.write(content)
+        temp_pdf.close()
+
+        # Extract data via NLP pipeline
+        extracted_data = extract_ddr_parameters(temp_pdf.name)
+        
+        return {
+            "status": "success",
+            "message": "File processed via NLP pipeline",
+            "filename": file.filename,
+            "extracted_data": extracted_data
+        }
+    finally:
+        if os.path.exists(temp_pdf.name):
+            os.remove(temp_pdf.name)
 
 @router.get("/queue")
 async def get_validation_queue():

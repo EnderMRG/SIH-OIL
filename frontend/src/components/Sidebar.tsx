@@ -129,7 +129,7 @@ export function Sidebar() {
               textTransform: "uppercase",
             }}
           >
-            Oil India Limited · Subsurface
+            WELLS.INTEL · Subsurface
           </p>
         </div>
 

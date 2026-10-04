@@ -256,7 +256,7 @@ export default function AuditPage() {
             SEC-GOV 204
           </span>
           <span className="text-[#1b1c1a] uppercase tracking-wider font-semibold">
-            GOVERNANCE & STATUTORY COMPLIANCE // OIL INDIA LIMITED SUB-SURFACE REGISTRY
+            GOVERNANCE & STATUTORY COMPLIANCE // WELLS.INTEL
           </span>
         </div>
         <div className="flex items-center gap-4">
@@ -580,7 +580,7 @@ export default function AuditPage() {
             <p className="text-xs font-sans text-[#444748] leading-relaxed">
               Every human action taken within the Real-Time Operations Center (RTOC) or Rig Doghouse generates an
               immutable payload with user public-key signature, WITSML telemetry snapshot, and UTC-coordinated GPS
-              location. Blocks are sealed at 60-second intervals and attested to the Oil India statutory archive.
+              location. Blocks are sealed at 60-second intervals and attested to the Nexus Energy statutory archive.
             </p>
 
             {/* Mini Visual Pipeline */}
@@ -769,7 +769,7 @@ export default function AuditPage() {
             <div className="pt-3 border-t border-[#dbdad6] flex items-center justify-between">
               <span className="text-[10px] font-mono text-[#765b00] font-semibold flex items-center gap-1">
                 <span className="material-symbols-outlined text-[14px]">check_circle</span>
-                Attested to Oil India DGMS Archive
+                Attested to Nexus Energy DGMS Archive
               </span>
               <button
                 onClick={() => {

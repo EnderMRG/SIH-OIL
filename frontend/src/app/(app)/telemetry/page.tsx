@@ -14,6 +14,7 @@ interface TelemetryPoint {
   flow: number;
   pvt: number;
   gas: number;
+  depth: number;
 }
 
 export default function TelemetryPage() {

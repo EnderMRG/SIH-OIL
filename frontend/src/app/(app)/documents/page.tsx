@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
+import { useGlobalContext } from "@/store/globalContext";
 
 interface ExtractionCandidate {
   id: string;
@@ -96,6 +97,92 @@ export default function DocumentsPage() {
   const [editingCandidate, setEditingCandidate] = useState<ExtractionCandidate | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    showToast(`Uploading ${file.name} to Document Intelligence Hub...`);
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await fetch("http://localhost:8000/api/documents/upload", {
+        method: "POST",
+        body: formData,
+      });
+      if (response.ok) {
+        const data = await response.json();
+        showToast(`✓ Processing queued for ${file.name}.`);
+        console.log("NLP Extraction Result:", data.extracted_data);
+        
+        // Add mock document to the list
+        const newDoc: ScannedDocument = {
+          id: `doc-new-${Date.now()}`,
+          filename: file.name,
+          subtitle: "Uploaded Document",
+          type: "pdf",
+          status: "pending",
+          stats: [{label: "VOLUME", value: "Unknown"}, {label: "OCR CONF.", value: "Processing"}],
+          page: 1,
+        };
+        setDocuments(prev => [newDoc, ...prev]);
+        
+        // Add extracted candidates if any
+        if (data.extracted_data) {
+           const newCandidate: ExtractionCandidate = {
+             id: `cand-${Date.now()}`,
+             docId: newDoc.id,
+             code: "#EXTRACTED-01",
+             eventType: "Parsed Event",
+             severity: "warning",
+             probability: 95.0,
+             depth: data.extracted_data.drilled_depth || "Unknown",
+             formation: data.extracted_data.lithology || "Unknown",
+             lossMud: data.extracted_data.drilling_fluid_losses || "Unknown",
+             ocrSnippet: data.extracted_data.work_carried_out || "Parsed text...",
+             highlightedPhrase: "Parsed automatically",
+             spatialImpact: "N/A",
+             proximity: "N/A"
+           };
+           setCandidates(prev => [newCandidate, ...prev]);
+           setSelectedDocId(newDoc.id);
+
+           // Link to Report Generator Hub
+           useGlobalContext.getState().addCustomReport({
+             reportNo: 999,
+             date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' }).replace(/ /g, '-'),
+             operator: "WELLS.INTEL",
+             rig: "SE-802",
+             wellName: data.extracted_data.well_name || "UNKNOWN WELL",
+             measuredDepth: parseFloat(data.extracted_data.drilled_depth) || 0,
+             verticalDepth: parseFloat(data.extracted_data.drilled_depth) || 0,
+             holeMade: 0,
+             drillingDays: "1/1",
+             currentOps: data.extracted_data.work_carried_out || "N/A",
+             plannedOps: "N/A",
+             safetySummary: "Parsed from NLP pipeline.",
+             operations: [
+               { from: "00:00", to: "24:00", elapsed: 24, endMd: parseFloat(data.extracted_data.drilled_depth) || 0, code: "NLP", desc: data.extracted_data.work_carried_out || "Parsed data" }
+             ],
+             managementSummary: `Parsed from NLP pipeline: ${file.name}`,
+             casing: [
+               { size: data.extracted_data.wellbore_geometry || "N/A", topMd: 0, botMd: parseFloat(data.extracted_data.drilled_depth) || 0, grade: "N/A", lot: 0 }
+             ],
+             mud: { density: 0, pv: 0, yp: 0, solids: 0, chlorides: 0 },
+             bha: { make: "N/A", model: "N/A", diam: "N/A", wob: 0, rpm: 0, flow: 0, press: 0 }
+           });
+        }
+      } else {
+        showToast("✕ Failed to upload document.");
+      }
+    } catch (error) {
+      console.error(error);
+      showToast("✕ Error connecting to Document API.");
+    }
+  };
+
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3000);
@@ -162,7 +249,7 @@ export default function DocumentsPage() {
                 eRTMAC-NWIS
               </span>
               <span>/</span>
-              <span>OIL INDIA SUB-SURFACE REGISTRY</span>
+              <span>WELLS.INTEL</span>
               <span>/</span>
               <span className="text-[#765b00] font-semibold">MODULE 07</span>
             </div>
@@ -196,8 +283,15 @@ export default function DocumentsPage() {
               </button>
             </div>
 
+            <input 
+              type="file" 
+              accept=".pdf,.txt" 
+              className="hidden" 
+              ref={fileInputRef} 
+              onChange={handleFileUpload} 
+            />
             <button
-              onClick={() => setShowUploadModal(true)}
+              onClick={() => fileInputRef.current?.click()}
               className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-[#0d0d0d] text-white text-[11px] font-mono uppercase tracking-wider font-semibold hover:opacity-90 transition-all shadow-sm"
             >
               <span className="material-symbols-outlined text-[18px]">upload_file</span>

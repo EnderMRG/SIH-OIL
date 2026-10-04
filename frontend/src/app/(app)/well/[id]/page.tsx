@@ -35,7 +35,7 @@ export default function WellPage() {
   const params = useParams();
   const rawId = typeof params?.id === "string" ? params.id : "OIL-NH-04";
   const wellId = rawId.toUpperCase().includes("OIL-") ? rawId.toUpperCase() : `OIL-${rawId.toUpperCase()}`;
-  const { unitSystem } = useGlobalContext();
+  const unitSystem = useGlobalContext((state) => state.unitSystem);
 
   const [activeTab, setActiveTab] = useState<string>("3d");
   const [viewMode3D, setViewMode3D] = useState<"schematic" | "webgl">("schematic");

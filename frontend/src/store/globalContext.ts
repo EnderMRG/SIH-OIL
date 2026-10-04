@@ -55,6 +55,10 @@ export interface GlobalContextState {
   sandboxSimulatedEcd: number | null;
   sandboxPill: string | null;
 
+  // Linked Reports from NLP Hub
+  customReports: any[];
+  addCustomReport: (report: any) => void;
+
   // Actions
   setCursorDepth: (tvdss: number, md: number) => void;
   setSelectedOffsets: (wellIds: string[]) => void;
@@ -103,6 +107,10 @@ export const useGlobalContext = create<GlobalContextState>()(
 
       sandboxSimulatedEcd: null,
       sandboxPill: null,
+
+      // Custom Reports from NLP Uploads
+      customReports: [],
+      addCustomReport: (report) => set((state) => ({ customReports: [report, ...state.customReports] })),
 
       // Actions
       setCursorDepth: (tvdss, md) => set({ cursorTVDSS: tvdss, cursorMD: md }),
